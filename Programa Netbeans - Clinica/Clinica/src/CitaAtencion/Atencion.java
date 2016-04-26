@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import org.apache.log4j.LogManager;
 
 public class Atencion extends javax.swing.JInternalFrame {
 
@@ -16,8 +17,9 @@ public class Atencion extends javax.swing.JInternalFrame {
     static DatCita cCita;
     private int nEstado;
     private List<List<String>> rsform;
+    private static final org.apache.log4j.Logger logger = LogManager.getRootLogger();
 
-    public Atencion() {
+    public Atencion(int id) {
         initComponents();
 
         cAtencion = new DatAtencion();
@@ -27,7 +29,7 @@ public class Atencion extends javax.swing.JInternalFrame {
         this.btnnew.grabFocus();
         txthabilita(false);
         btnHabilita(true);
-        txt_idCita.setText(cCita.getCita_id() + "");
+        txt_idCita.setText(String.valueOf(id)/*cCita.getCita_id() + ""*/);
         txt_idCita.setEditable(false);
     }
 
@@ -54,8 +56,10 @@ public class Atencion extends javax.swing.JInternalFrame {
 
         try {
             rsform = cAtencion.consultar("atencion_consulta_TRANSACT");
+            logger.debug("Consulto base procedimientos");
         } catch (SQLException ex) {
             Logger.getLogger(Atencion.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("salio error al consulta base");
         }
 
     }
@@ -174,6 +178,7 @@ public class Atencion extends javax.swing.JInternalFrame {
 
             cAtencion.GrabarNew();
             this.txt_id.setText(cAtencion.getAtencion_id() + "");
+            
 
         } else if (nEstado == 2) {
             cAtencion.modificar();
@@ -197,9 +202,11 @@ public class Atencion extends javax.swing.JInternalFrame {
             cAtencion.setEstudios(txt_estud.getText());
             java.sql.Date fecha = convertJavaDateToSqlDate(this.jd_fecha.getDate());
             cAtencion.setFecha_hora(fecha);
+            logger.debug("cargo clase");
 
         } catch (ParseException ex) {
             Logger.getLogger(Atencion.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("error al cargar clase");
         }
 
     }
@@ -499,8 +506,10 @@ public class Atencion extends javax.swing.JInternalFrame {
         if ((nEstado == 1) || (nEstado == 2)) {
             try {
                 grabar();
+                logger.debug("grabo atencion exitoso");
             } catch (SQLException | java.text.ParseException ex) {
                 Logger.getLogger(Atencion.class.getName()).log(Level.SEVERE, null, ex);
+                logger.debug("error al grabar atencion");
             }
         } else {
             nuevo();

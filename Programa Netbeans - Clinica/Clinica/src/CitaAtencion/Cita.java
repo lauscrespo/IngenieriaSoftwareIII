@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import org.apache.log4j.LogManager;
 
 public class Cita extends javax.swing.JInternalFrame {
 
@@ -16,12 +17,11 @@ public class Cita extends javax.swing.JInternalFrame {
     private int nEstado;
     private List<List<String>> rsform;
     private Atencion atencion;
-
+    private static final org.apache.log4j.Logger logger = LogManager.getRootLogger();
+    
     public Cita() {
         initComponents();
-
         cCita = new DatCita();
-
         nEstado = -1;
         this.txt_id.setEditable(false);
         this.btnnew.grabFocus();
@@ -38,16 +38,14 @@ public class Cita extends javax.swing.JInternalFrame {
     }
 
     public void AbrirDB(String Navega) {
-
         cCita.setNavega(Navega);
         cCita.setProceso("QUERY_NAV");
-
         try {
             rsform = cCita.consultar("cita_TRANSACT");
         } catch (SQLException ex) {
             Logger.getLogger(Cita.class.getName()).log(Level.SEVERE, null, ex);
+            logger.debug("AbrirBD Error");
         }
-
     }
 
     public void nuevo() {
@@ -59,7 +57,6 @@ public class Cita extends javax.swing.JInternalFrame {
     }
 
     public void cancelar() {
-
         nEstado = -1;
         this.InitDatos();
         this.txthabilita(false);
@@ -68,11 +65,11 @@ public class Cita extends javax.swing.JInternalFrame {
     }
 
     public void modificar() {
-        if ((this.txt_id.getText() == "0")) {
+        if (("0".equals(this.txt_id.getText()))) {
             return;
         }
 
-        if ((this.txt_id.getText() == "")) {
+        if (("".equals(this.txt_id.getText()))) {
             return;
         }
 
@@ -174,6 +171,7 @@ public class Cita extends javax.swing.JInternalFrame {
         btnHabilita(true);
         txthabilita(false);
         btnnew.setFocusable(true);
+        logger.debug("Grabar nueva cita");
     }
 
     public void cargarclase() throws java.text.ParseException {
@@ -186,9 +184,11 @@ public class Cita extends javax.swing.JInternalFrame {
             cCita.setUser_id(Integer.parseInt(txt_usuario.getText()));
             java.sql.Date fecha = convertJavaDateToSqlDate(this.jd_fecha.getDate());
             cCita.setFecha_hora(fecha);
+            logger.debug("cargo clase");
 
         } catch (ParseException ex) {
             Logger.getLogger(Cita.class.getName()).log(Level.SEVERE, null, ex);
+
         }
 
     }
@@ -205,12 +205,14 @@ public class Cita extends javax.swing.JInternalFrame {
         txt_paciente.setText(cCita.getPaciente_id() + "");
         txt_usuario.setText(cCita.getUser_id() + "");
         txt_observaciones.setText(cCita.getObservaciones().trim());
+        logger.debug("cargo edit");
 
     }
 
     private void anular() throws SQLException {
         cCita.anular();
         InitDatos();
+        logger.debug("se eliminara datos");
     }
 
     @SuppressWarnings("unchecked")
@@ -530,21 +532,22 @@ public class Cita extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnfinActionPerformed
 
     private void btn_atenderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_atenderActionPerformed
+        
+        
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (!txt_id.getText().equals("") && !txt_id.getText().equals("0")) {
                     desktopFondo.removeAll();
                     desktopFondo.repaint();
-                    atencion = new Atencion();
-                    atencion.setcCita(cCita);
+                    atencion = new Atencion(cCita.getCita_id());
                     desktopFondo.add(atencion);
                     atencion.show();
-                    new Atencion().setVisible(true);
+                    logger.debug(cCita.getCita_id());
                 } else {
                     JOptionPane.showMessageDialog(Cita.this, "Eliga una consulta");
+                    logger.error("Eliga una consulta");
                 }
-
             }
         });
 

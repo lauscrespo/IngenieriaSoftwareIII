@@ -20,6 +20,7 @@ public class Pacientes extends javax.swing.JInternalFrame {
     private DefaultTableModel pacientesModelo;
     private RegistrarPacientes insert;
     private EditarPacientes edit;
+    private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getRootLogger();
 
     public Pacientes() {
         initComponents();
@@ -162,6 +163,7 @@ public class Pacientes extends javax.swing.JInternalFrame {
             } catch (SQLException | HeadlessException e) {
                 JOptionPane.showMessageDialog(this, "Error");
                 System.out.println(e);
+                logger.error(e);
             }
         }
     }//GEN-LAST:event_btnEliminarActionPerformed
@@ -227,6 +229,7 @@ public class Pacientes extends javax.swing.JInternalFrame {
             tblPacientes.setModel(pacientesModelo);
         } catch (SQLException ex) {
             Logger.getLogger(Pacientes.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
         }
     }
 

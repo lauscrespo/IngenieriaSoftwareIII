@@ -100,7 +100,6 @@
                           <EmptySpace min="28" pref="28" max="-2" attributes="0"/>
                       </Group>
                   </Group>
-                  <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="txtFullName" alignment="3" min="-2" max="-2" attributes="0"/>
