@@ -13,7 +13,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+<<<<<<< HEAD
 import javax.swing.table.DefaultTableModel;
+=======
+>>>>>>> cb2c3ac2169ead0943a7fa0cd70418d14611ee44
 import org.apache.log4j.LogManager;
 
 public class Cita extends javax.swing.JInternalFrame {
@@ -22,11 +25,16 @@ public class Cita extends javax.swing.JInternalFrame {
     private int nEstado;
     private List<List<String>> rsform;
     private Atencion atencion;
+<<<<<<< HEAD
     private final Conexion conexion;
     private final Connection conection;
     private DefaultTableModel cita_Modelo;
     private static final org.apache.log4j.Logger logger = LogManager.getRootLogger();
 
+=======
+    private static final org.apache.log4j.Logger logger = LogManager.getRootLogger();
+    
+>>>>>>> cb2c3ac2169ead0943a7fa0cd70418d14611ee44
     public Cita() {
         initComponents();
         cCita = new DatCita();
@@ -241,7 +249,10 @@ public class Cita extends javax.swing.JInternalFrame {
         txt_paciente.setText(cCita.getPaciente_id() + "");
         txt_usuario.setText(cCita.getUser_id() + "");
         txt_observaciones.setText(cCita.getObservaciones().trim());
+<<<<<<< HEAD
         jd_fecha.setDate(cCita.getFecha_hora());
+=======
+>>>>>>> cb2c3ac2169ead0943a7fa0cd70418d14611ee44
         logger.debug("cargo edit");
 
     }
@@ -587,7 +598,12 @@ public class Cita extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnfinActionPerformed
 
     private void btn_atenderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_atenderActionPerformed
+<<<<<<< HEAD
 
+=======
+        
+        
+>>>>>>> cb2c3ac2169ead0943a7fa0cd70418d14611ee44
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {

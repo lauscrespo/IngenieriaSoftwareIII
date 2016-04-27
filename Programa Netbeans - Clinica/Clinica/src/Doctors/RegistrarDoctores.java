@@ -13,6 +13,7 @@ public class RegistrarDoctores extends javax.swing.JInternalFrame {
 
     private final Conexion conexion;
     private final Connection conection;
+    private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getRootLogger();
     
     public RegistrarDoctores() {
         initComponents();
@@ -175,6 +176,7 @@ public class RegistrarDoctores extends javax.swing.JInternalFrame {
             } catch (SQLException | HeadlessException e) {
                 JOptionPane.showMessageDialog(this, "Error Al Insertar");
                 System.out.println(e);
+                logger.error(e);
             }
         } else {
             JOptionPane.showMessageDialog(this, "Debe ingresar todos los datos correctamente", "Error", JOptionPane.WARNING_MESSAGE);

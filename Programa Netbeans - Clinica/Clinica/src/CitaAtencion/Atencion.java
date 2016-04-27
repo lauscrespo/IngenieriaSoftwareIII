@@ -13,7 +13,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+<<<<<<< HEAD
 import javax.swing.table.DefaultTableModel;
+=======
+>>>>>>> cb2c3ac2169ead0943a7fa0cd70418d14611ee44
 import org.apache.log4j.LogManager;
 
 public class Atencion extends javax.swing.JInternalFrame {
@@ -22,12 +25,17 @@ public class Atencion extends javax.swing.JInternalFrame {
     static DatCita cCita;
     private int nEstado;
     private List<List<String>> rsform;
+<<<<<<< HEAD
     private final Conexion conexion;
     private final Connection conection;
     private DefaultTableModel atencion_Modelo;
 
     private static final org.apache.log4j.Logger logger = LogManager.getRootLogger();
 
+=======
+    private static final org.apache.log4j.Logger logger = LogManager.getRootLogger();
+
+>>>>>>> cb2c3ac2169ead0943a7fa0cd70418d14611ee44
     public Atencion(int id) {
         initComponents();
 
@@ -216,6 +224,7 @@ public class Atencion extends javax.swing.JInternalFrame {
 
             cAtencion.GrabarNew();
             this.txt_id.setText(cAtencion.getAtencion_id() + "");
+            
 
         } else if (nEstado == 2) {
             cAtencion.modificar();

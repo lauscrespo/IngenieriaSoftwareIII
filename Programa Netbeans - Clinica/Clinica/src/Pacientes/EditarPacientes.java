@@ -16,6 +16,7 @@ public final class EditarPacientes extends javax.swing.JInternalFrame {
 
     private final Conexion conexion;
     private final Connection conection;
+    private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getRootLogger();
 
     public EditarPacientes(String id) {
         initComponents();
@@ -230,6 +231,7 @@ public final class EditarPacientes extends javax.swing.JInternalFrame {
             } catch (SQLException | HeadlessException e) {
                 JOptionPane.showMessageDialog(this, "Error Al Editar");
                 System.out.println(e);
+                logger.error(e);
             }
         } else {
             JOptionPane.showMessageDialog(this, "Debe ingresar todos los datos correctamente", "Error", JOptionPane.WARNING_MESSAGE);
@@ -282,6 +284,8 @@ public final class EditarPacientes extends javax.swing.JInternalFrame {
             }
         } catch (SQLException ex) {
             Logger.getLogger(EditarPacientes.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
+                    
         }
     }
 }

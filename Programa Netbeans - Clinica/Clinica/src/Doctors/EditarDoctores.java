@@ -15,6 +15,7 @@ public class EditarDoctores extends javax.swing.JInternalFrame {
 
     private final Conexion conexion;
     private final Connection conection;
+    private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getRootLogger();
 
     public EditarDoctores(String id) {
         initComponents();
@@ -182,6 +183,7 @@ public class EditarDoctores extends javax.swing.JInternalFrame {
             } catch (SQLException | HeadlessException e) {
                 JOptionPane.showMessageDialog(this, "Error Al Actualizar");
                 System.out.println(e);
+                logger.error(e);
             }
         } else {
             JOptionPane.showMessageDialog(this, "Debe ingresar todos los datos correctamente", "Error", JOptionPane.WARNING_MESSAGE);
@@ -224,6 +226,7 @@ public class EditarDoctores extends javax.swing.JInternalFrame {
             }
         } catch (SQLException ex) {
             Logger.getLogger(EditarDoctores.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
         }
     }
 }
