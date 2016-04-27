@@ -1,7 +1,11 @@
 package CitaAtencion;
 
+import Conexion.Conexion;
 import DatosCitaAtencion.DatCita;
+import Doctors.Doctores;
 import static Main.Main.desktopFondo;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Date;
@@ -9,6 +13,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import org.apache.log4j.LogManager;
 
 public class Cita extends javax.swing.JInternalFrame {
 
@@ -16,17 +22,49 @@ public class Cita extends javax.swing.JInternalFrame {
     private int nEstado;
     private List<List<String>> rsform;
     private Atencion atencion;
+    private final Conexion conexion;
+    private final Connection conection;
+    private DefaultTableModel cita_Modelo;
+    private static final org.apache.log4j.Logger logger = LogManager.getRootLogger();
 
     public Cita() {
         initComponents();
-
         cCita = new DatCita();
-
         nEstado = -1;
         this.txt_id.setEditable(false);
         this.btnnew.grabFocus();
         txthabilita(false);
+        conexion = new Conexion();
+        conection = conexion.getConnection();
         btnHabilita(true);
+        mostrardatos();
+    }
+
+    private void mostrardatos() {
+        cita_Modelo = new DefaultTableModel();
+        cita_Modelo.addColumn("ID");
+        cita_Modelo.addColumn("FECHA");
+        cita_Modelo.addColumn("DOCTOR_ID");
+        cita_Modelo.addColumn("PACIENTE_ID");
+        cita_Modelo.addColumn("OBSERVAC");
+        cita_Modelo.addColumn("USER_ID");
+        jt_datos.setModel(cita_Modelo);
+        String[] datos = new String[6];
+        try {
+            ResultSet rs = conexion.obtenerConsulta("select *from cita order by fecha_hora desc;");
+            while (rs.next()) {
+                datos[0] = rs.getString(1);
+                datos[1] = rs.getString(2);
+                datos[2] = rs.getString(3);
+                datos[3] = rs.getString(4);
+                datos[4] = rs.getString(5);
+                datos[5] = rs.getString(6);
+                cita_Modelo.addRow(datos);
+            }
+            jt_datos.setModel(cita_Modelo);
+        } catch (SQLException ex) {
+            Logger.getLogger(Doctores.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private void txthabilita(Boolean valor) {
@@ -34,20 +72,18 @@ public class Cita extends javax.swing.JInternalFrame {
         this.txt_paciente.setEditable(valor);
         this.txt_usuario.setEditable(valor);
         this.txt_observaciones.setEditable(valor);
-        this.jd_fecha.setEnabled(valor);
+       this.jd_fecha.setEnabled(valor);
     }
 
     public void AbrirDB(String Navega) {
-
         cCita.setNavega(Navega);
         cCita.setProceso("QUERY_NAV");
-
         try {
             rsform = cCita.consultar("cita_TRANSACT");
         } catch (SQLException ex) {
             Logger.getLogger(Cita.class.getName()).log(Level.SEVERE, null, ex);
+            logger.debug("AbrirBD Error");
         }
-
     }
 
     public void nuevo() {
@@ -59,7 +95,6 @@ public class Cita extends javax.swing.JInternalFrame {
     }
 
     public void cancelar() {
-
         nEstado = -1;
         this.InitDatos();
         this.txthabilita(false);
@@ -68,11 +103,11 @@ public class Cita extends javax.swing.JInternalFrame {
     }
 
     public void modificar() {
-        if ((this.txt_id.getText() == "0")) {
+        if (("0".equals(this.txt_id.getText()))) {
             return;
         }
 
-        if ((this.txt_id.getText() == "")) {
+        if (("".equals(this.txt_id.getText()))) {
             return;
         }
 
@@ -132,9 +167,7 @@ public class Cita extends javax.swing.JInternalFrame {
     public void posconsul(String Navega) throws java.text.ParseException {
 
         this.InitDatos();
-        // this.cargarclase();
-
-        //' codigo para cargar los datos a la pantalla
+        
         AbrirDB(Navega);
 
         this.cargaredit();
@@ -174,6 +207,7 @@ public class Cita extends javax.swing.JInternalFrame {
         btnHabilita(true);
         txthabilita(false);
         btnnew.setFocusable(true);
+        logger.debug("Grabar nueva cita");
     }
 
     public void cargarclase() throws java.text.ParseException {
@@ -186,9 +220,11 @@ public class Cita extends javax.swing.JInternalFrame {
             cCita.setUser_id(Integer.parseInt(txt_usuario.getText()));
             java.sql.Date fecha = convertJavaDateToSqlDate(this.jd_fecha.getDate());
             cCita.setFecha_hora(fecha);
+            logger.debug("cargo clase");
 
         } catch (ParseException ex) {
             Logger.getLogger(Cita.class.getName()).log(Level.SEVERE, null, ex);
+
         }
 
     }
@@ -205,12 +241,15 @@ public class Cita extends javax.swing.JInternalFrame {
         txt_paciente.setText(cCita.getPaciente_id() + "");
         txt_usuario.setText(cCita.getUser_id() + "");
         txt_observaciones.setText(cCita.getObservaciones().trim());
+        jd_fecha.setDate(cCita.getFecha_hora());
+        logger.debug("cargo edit");
 
     }
 
     private void anular() throws SQLException {
         cCita.anular();
         InitDatos();
+        logger.debug("se eliminara datos");
     }
 
     @SuppressWarnings("unchecked")
@@ -241,6 +280,8 @@ public class Cita extends javax.swing.JInternalFrame {
         txt_paciente = new javax.swing.JTextField();
         txt_usuario = new javax.swing.JTextField();
         btn_atender = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jt_datos = new javax.swing.JTable();
 
         setClosable(true);
         setTitle("Citas");
@@ -341,107 +382,129 @@ public class Cita extends javax.swing.JInternalFrame {
             }
         });
 
+        jt_datos.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        jt_datos.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jt_datosMouseClicked(evt);
+            }
+        });
+        jScrollPane2.setViewportView(jt_datos);
+
         javax.swing.GroupLayout jp_panleLayout = new javax.swing.GroupLayout(jp_panle);
         jp_panle.setLayout(jp_panleLayout);
         jp_panleLayout.setHorizontalGroup(
             jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jp_panleLayout.createSequentialGroup()
-                .addGap(56, 56, 56)
-                .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel7)
-                    .addComponent(jLabel9))
-                .addGap(18, 18, 18)
-                .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txt_idDoctor)
-                    .addComponent(txt_id, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel8)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(jp_panleLayout.createSequentialGroup()
-                .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jp_panleLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(btn_atender)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(56, 56, 56)
+                        .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel7)
+                            .addComponent(jLabel9))
+                        .addGap(18, 18, 18)
+                        .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txt_idDoctor)
+                            .addComponent(txt_id, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel8)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jp_panleLayout.createSequentialGroup()
+                        .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(jp_panleLayout.createSequentialGroup()
-                                .addComponent(btnnew, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnModify, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnanu, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jp_panleLayout.createSequentialGroup()
-                                .addGap(77, 77, 77)
-                                .addComponent(btnini)
+                                .addContainerGap()
+                                .addComponent(btn_atender)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(btnant)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(btnsig)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btnfin))))
-                    .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jp_panleLayout.createSequentialGroup()
-                            .addGap(12, 12, 12)
-                            .addComponent(jLabel2)
-                            .addGap(12, 12, 12)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 342, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(jp_panleLayout.createSequentialGroup()
-                            .addGap(50, 50, 50)
-                            .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(jLabel6)
-                                .addComponent(jLabel1)
-                                .addComponent(jLabel10))
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jp_panleLayout.createSequentialGroup()
+                                        .addComponent(btnnew, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(btnModify, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(btnanu, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jp_panleLayout.createSequentialGroup()
+                                        .addGap(77, 77, 77)
+                                        .addComponent(btnini)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(btnant)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(btnsig)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(btnfin))))
                             .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(txt_paciente, javax.swing.GroupLayout.DEFAULT_SIZE, 84, Short.MAX_VALUE)
-                                    .addComponent(txt_usuario))
-                                .addComponent(jd_fecha, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addGroup(jp_panleLayout.createSequentialGroup()
+                                    .addGap(12, 12, 12)
+                                    .addComponent(jLabel2)
+                                    .addGap(12, 12, 12)
+                                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 342, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGroup(jp_panleLayout.createSequentialGroup()
+                                    .addGap(50, 50, 50)
+                                    .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(jLabel6)
+                                        .addComponent(jLabel1)
+                                        .addComponent(jLabel10))
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                    .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                            .addComponent(txt_paciente, javax.swing.GroupLayout.DEFAULT_SIZE, 84, Short.MAX_VALUE)
+                                            .addComponent(txt_usuario))
+                                        .addComponent(jd_fecha, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 425, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         jp_panleLayout.setVerticalGroup(
             jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jp_panleLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(txt_id, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel9))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel7)
-                    .addComponent(txt_idDoctor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel8))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jd_fecha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1))
-                .addGap(18, 18, 18)
-                .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel6)
-                    .addComponent(txt_paciente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel10)
-                    .addComponent(txt_usuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(26, 26, 26)
-                .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnModify, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnanu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnnew, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btn_atender))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnfin, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnsig)
-                    .addComponent(btnant)
-                    .addComponent(btnini))
+                    .addGroup(jp_panleLayout.createSequentialGroup()
+                        .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(txt_id, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel9))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel7)
+                            .addComponent(txt_idDoctor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel8))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jd_fecha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel1))
+                        .addGap(18, 18, 18)
+                        .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel6)
+                            .addComponent(txt_paciente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel10)
+                            .addComponent(txt_usuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(26, 26, 26)
+                        .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnModify, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnanu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnnew, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btn_atender))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jp_panleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnfin, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnsig)
+                            .addComponent(btnant)
+                            .addComponent(btnini)))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -449,17 +512,11 @@ public class Cita extends javax.swing.JInternalFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jp_panle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jp_panle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jp_panle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+            .addComponent(jp_panle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
@@ -530,25 +587,39 @@ public class Cita extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnfinActionPerformed
 
     private void btn_atenderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_atenderActionPerformed
+
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
                 if (!txt_id.getText().equals("") && !txt_id.getText().equals("0")) {
                     desktopFondo.removeAll();
                     desktopFondo.repaint();
-                    atencion = new Atencion();
-                    atencion.setcCita(cCita);
+                    atencion = new Atencion(cCita.getCita_id());
                     desktopFondo.add(atencion);
                     atencion.show();
-                    new Atencion().setVisible(true);
+                    logger.debug(cCita.getCita_id());
                 } else {
                     JOptionPane.showMessageDialog(Cita.this, "Eliga una consulta");
+                    logger.error("Eliga una consulta");
                 }
-
             }
         });
 
     }//GEN-LAST:event_btn_atenderActionPerformed
+
+    private void jt_datosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jt_datosMouseClicked
+         int row = jt_datos.rowAtPoint(evt.getPoint());
+
+        this.InitDatos();
+
+        AbrirDB(jt_datos.getValueAt(row, 0).toString());
+
+        this.cargaredit();
+
+        this.txt_id.setEditable(false);
+
+        nEstado = -3;
+    }//GEN-LAST:event_jt_datosMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -569,8 +640,10 @@ public class Cita extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private com.toedter.calendar.JDateChooser jd_fecha;
     private javax.swing.JPanel jp_panle;
+    private javax.swing.JTable jt_datos;
     private javax.swing.JTextField txt_id;
     private javax.swing.JTextField txt_idDoctor;
     private javax.swing.JTextArea txt_observaciones;
