@@ -158,6 +158,7 @@ public class Pacientes extends javax.swing.JInternalFrame {
                 PreparedStatement ps = conection.prepareStatement("EXEC spDeletePacientes ?");
                 ps.setString(1, tblPacientes.getValueAt(fila, 0).toString());
                 ps.executeUpdate();
+                ps.getMoreResults();
                 JOptionPane.showMessageDialog(this, "PACIENTE ELIMINADO", "MENSAJE", JOptionPane.INFORMATION_MESSAGE);
                 pacientesModelo.removeRow(fila);
             } catch (SQLException | HeadlessException e) {

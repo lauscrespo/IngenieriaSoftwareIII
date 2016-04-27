@@ -4,12 +4,6 @@ import static Main.Main.desktopFondo;
 import conexion.pool;
 import java.awt.BorderLayout;
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.table.DefaultTableModel;
 
 public class Opciones extends javax.swing.JInternalFrame {
 
@@ -19,8 +13,8 @@ public class Opciones extends javax.swing.JInternalFrame {
     public FrameUsuarios cbPermisoUsuarios;
     private boolean AddPermisosUser;
     Connection cn = null;
-     pool cc = new pool();
-    
+    pool cc = new pool();
+
     public Opciones() {
         initComponents();
         this.setLocation(150, 20);
@@ -124,16 +118,20 @@ public class Opciones extends javax.swing.JInternalFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-   
-    
-    
+
     private void lbUserMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbUserMouseClicked
-         
+        desktopFondo.removeAll();
+        desktopFondo.repaint();
+        users = new FrameUsuarios();
+        desktopFondo.add(users);
+        users.toFront();
+        users.setVisible(true);
+        this.hide();
     }//GEN-LAST:event_lbUserMouseClicked
 
     private void lbRolMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbRolMouseClicked
         // TODO add your handling code here:
-   
+
         desktopFondo.removeAll();
         desktopFondo.repaint();
         rol = new FrameRol(2);
@@ -141,8 +139,8 @@ public class Opciones extends javax.swing.JInternalFrame {
         rol.toFront();
         rol.setVisible(true);
         this.hide();
-      
-        
+
+
     }//GEN-LAST:event_lbRolMouseClicked
 
     private void lbPersonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbPersonMouseClicked

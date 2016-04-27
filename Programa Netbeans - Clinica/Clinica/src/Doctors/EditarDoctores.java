@@ -15,6 +15,7 @@ public class EditarDoctores extends javax.swing.JInternalFrame {
 
     private final Conexion conexion;
     private final Connection conection;
+    private String idUser;
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getRootLogger();
 
     public EditarDoctores(String id) {
@@ -25,6 +26,10 @@ public class EditarDoctores extends javax.swing.JInternalFrame {
         lbIdDoctor.setText(id);
         mostrarDoctor(id);
         lbIdDoctor.setVisible(false);
+        llenarComboUsuarios();
+        txtUsersCode.setVisible(false);
+        String idS = idSeleccionado(idUser);
+        cbUsersNames.setSelectedItem(idS);
     }
 
     @SuppressWarnings("unchecked")
@@ -38,10 +43,11 @@ public class EditarDoctores extends javax.swing.JInternalFrame {
         jLabel4 = new javax.swing.JLabel();
         txtFullName = new javax.swing.JTextField();
         txtEspecialidad = new javax.swing.JTextField();
-        txtIdUser = new javax.swing.JTextField();
         btnGuardar = new javax.swing.JButton();
         btnCancelar = new javax.swing.JButton();
         lbIdDoctor = new javax.swing.JLabel();
+        cbUsersNames = new javax.swing.JComboBox<>();
+        txtUsersCode = new javax.swing.JTextField();
 
         jPanel1.setBackground(new java.awt.Color(204, 255, 255));
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
@@ -60,7 +66,7 @@ public class EditarDoctores extends javax.swing.JInternalFrame {
 
         jLabel4.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(102, 102, 102));
-        jLabel4.setText("ID USUARIO:");
+        jLabel4.setText("USUARIO DOCTOR:");
 
         btnGuardar.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         btnGuardar.setForeground(new java.awt.Color(102, 102, 102));
@@ -82,10 +88,23 @@ public class EditarDoctores extends javax.swing.JInternalFrame {
             }
         });
 
+        cbUsersNames.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        cbUsersNames.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbUsersNamesActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(146, 146, 146)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lbIdDoctor, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(57, 57, 57))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -97,21 +116,18 @@ public class EditarDoctores extends javax.swing.JInternalFrame {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(81, 81, 81)
                         .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 162, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(txtFullName)
-                        .addComponent(txtEspecialidad)
-                        .addComponent(txtIdUser, javax.swing.GroupLayout.DEFAULT_SIZE, 178, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(cbUsersNames, 0, 178, Short.MAX_VALUE)
+                    .addComponent(txtFullName)
+                    .addComponent(txtEspecialidad)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(btnCancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(146, 146, 146)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(lbIdDoctor, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(57, 57, 57))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(txtUsersCode, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -122,7 +138,6 @@ public class EditarDoctores extends javax.swing.JInternalFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addComponent(lbIdDoctor, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(28, 28, 28)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(txtFullName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -130,15 +145,17 @@ public class EditarDoctores extends javax.swing.JInternalFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(txtEspecialidad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(59, 59, 59)
+                .addGap(58, 58, 58)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(txtIdUser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(98, 98, 98)
+                    .addComponent(cbUsersNames, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtUsersCode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(67, 67, 67)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnCancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(23, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -163,13 +180,13 @@ public class EditarDoctores extends javax.swing.JInternalFrame {
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
         // TODO add your handling code here:
-        if (!txtFullName.getText().isEmpty() || !txtIdUser.getText().isEmpty() || !txtEspecialidad.getText().isEmpty()) {
+        if (!txtFullName.getText().isEmpty() || !txtUsersCode.getText().isEmpty() || !txtEspecialidad.getText().isEmpty()) {
             try {
                 PreparedStatement ps = conection.prepareStatement("EXEC spUpdateDoctores  ?,?,?,?");
                 ps.setString(1, lbIdDoctor.getText());
                 ps.setString(2, txtFullName.getText());
                 ps.setString(3, txtEspecialidad.getText());
-                ps.setString(4, txtIdUser.getText());
+                ps.setString(4, txtUsersCode.getText());
                 ps.executeUpdate();
                 ps.getMoreResults();
                 JOptionPane.showMessageDialog(this, "Datos Actualizados", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
@@ -201,10 +218,24 @@ public class EditarDoctores extends javax.swing.JInternalFrame {
         this.dispose();
     }//GEN-LAST:event_btnCancelarActionPerformed
 
+    private void cbUsersNamesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbUsersNamesActionPerformed
+        // TODO add your handling code here:
+        try {
+            ResultSet rs = conexion.obtenerConsulta("select UserID from tbl_seg_user where UserName = '" + cbUsersNames.getSelectedItem().toString() + "';");
+            while (rs.next()) {
+                txtUsersCode.setText(String.valueOf(rs.getInt(1)));
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+            logger.error(e);
+        }
+    }//GEN-LAST:event_cbUsersNamesActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnGuardar;
+    private javax.swing.JComboBox<String> cbUsersNames;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -213,20 +244,48 @@ public class EditarDoctores extends javax.swing.JInternalFrame {
     private javax.swing.JLabel lbIdDoctor;
     private javax.swing.JTextField txtEspecialidad;
     private javax.swing.JTextField txtFullName;
-    private javax.swing.JTextField txtIdUser;
+    private javax.swing.JTextField txtUsersCode;
     // End of variables declaration//GEN-END:variables
 
     private void mostrarDoctor(String id) {
-         try {
+        try {
             ResultSet rs = conexion.obtenerConsulta("select * from fnDoctoresSelectById(" + id + ");");
             while (rs.next()) {
                 txtFullName.setText(rs.getString(2));
                 txtEspecialidad.setText(rs.getString(3));
-                txtIdUser.setText(rs.getString(4));
+                txtUsersCode.setText(rs.getString(4));
+                idUser = rs.getString(4);
             }
         } catch (SQLException ex) {
             Logger.getLogger(EditarDoctores.class.getName()).log(Level.SEVERE, null, ex);
             logger.error(ex);
         }
+    }
+
+    public final void llenarComboUsuarios() {
+        this.cbUsersNames.removeAllItems();
+        try {
+            ResultSet rs = conexion.obtenerConsulta("Select userName from tbl_seg_user;");
+            while (rs.next()) {
+                this.cbUsersNames.addItem(rs.getString(1));
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+            logger.error(e);
+        }
+    }
+
+    private String idSeleccionado(String id) {
+        String userName = "";
+        try {
+            ResultSet rs = conexion.obtenerConsulta("Select userName from tbl_seg_user where UserID = " + id + ";");
+            while (rs.next()) {
+                userName = rs.getString(1);
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+            logger.error(e);
+        }
+        return userName;
     }
 }

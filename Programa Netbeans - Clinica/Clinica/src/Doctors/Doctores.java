@@ -156,6 +156,7 @@ public class Doctores extends javax.swing.JInternalFrame {
                 PreparedStatement ps = conection.prepareStatement("EXEC spDeleteDoctores ?");
                 ps.setString(1, tblDoctores.getValueAt(fila, 0).toString());
                 ps.executeUpdate();
+                ps.getMoreResults();
                 JOptionPane.showMessageDialog(this, "DOCTOR ELIMINADO", "MENSAJE", JOptionPane.INFORMATION_MESSAGE);
                 pacientesModelo.removeRow(fila);
             } catch (SQLException | HeadlessException e) {
