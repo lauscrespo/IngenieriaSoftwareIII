@@ -1,7 +1,7 @@
 package Login;
 
+import Conexion.Conexion;
 import static Main.Main.desktopFondo;
-import conexion.pool;
 import java.awt.BorderLayout;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -14,8 +14,8 @@ import javax.swing.table.DefaultTableModel;
 
 public class FramePerson extends javax.swing.JInternalFrame {
 
-    pool cc = new pool();
-    Connection cn = null;
+    Conexion cc;
+    Connection cn;
     Opciones opciones;
     Opciones2 opciones2;
     AddPerson person;
@@ -23,6 +23,8 @@ public class FramePerson extends javax.swing.JInternalFrame {
 
     public FramePerson(int tipo) {
         initComponents();
+        cc = new Conexion();
+        cn = cc.getConnection();
         this.setLocation(350, 50);
         PanelFondo2 F = new PanelFondo2();
         this.add(F, BorderLayout.CENTER);
@@ -48,8 +50,6 @@ public class FramePerson extends javax.swing.JInternalFrame {
         }
         String[] datos = new String[7];
         try {
-            cn = cc.datasource.getConnection();
-
             Statement st = cn.createStatement();
             ResultSet rs = st.executeQuery(sql);
             while (rs.next()) {

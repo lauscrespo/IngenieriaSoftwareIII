@@ -1,7 +1,7 @@
 package Login;
 
+import Conexion.Conexion;
 import static Main.Main.desktopFondo;
-import conexion.pool;
 import java.awt.BorderLayout;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,12 +12,15 @@ import javax.swing.JOptionPane;
 
 public final class AddPermisosUser extends javax.swing.JInternalFrame {
 
-    pool cc = new pool();
-    Connection cn = null;
+    Conexion cc;
+    Connection cn;
     FrameUsuarios users;
 
     public AddPermisosUser() {
         initComponents();
+        cc = new Conexion();
+        cn = cc.getConnection();
+        
         llenarRol();
         llenarUser();
         this.setLocation(350, 50);
@@ -159,18 +162,16 @@ public final class AddPermisosUser extends javax.swing.JInternalFrame {
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
         // TODO add your handling code here:
-
-        pool cc = new pool();
-        Connection cn = null;
+        
         int a = Integer.parseInt(txtRol.getText());
         System.out.println(a);
 
         try {
-            cn = cc.datasource.getConnection();
             PreparedStatement psql = cn.prepareStatement("insert into tbl_seg_permissionsuserroles (PermissionId, OwnerId, OwnerType) values ('"
                     + cbPermiso.getSelectedItem().toString() + "','" + txtUser.getText() + "'," + a + ");"
             );
             psql.executeUpdate();
+            psql.getMoreResults();
             JOptionPane.showMessageDialog(this, "Permiso/User/Rol Insertado");
         } catch (SQLException e) {
             System.out.println(e);
@@ -232,7 +233,6 @@ public final class AddPermisosUser extends javax.swing.JInternalFrame {
         this.cbRoles.removeAllItems();
         String sql = "select * from tbl_roles";
         try {
-            cn = cc.datasource.getConnection();
             Statement st = cn.createStatement();
             ResultSet rs = st.executeQuery(sql);
             while (rs.next()) {
@@ -247,7 +247,6 @@ public final class AddPermisosUser extends javax.swing.JInternalFrame {
         this.cbUser.removeAllItems();
         String sql = "select * from tbl_seg_user";
         try {
-            cn = cc.datasource.getConnection();
             Statement st = cn.createStatement();
             ResultSet rs = st.executeQuery(sql);
             while (rs.next()) {
@@ -261,7 +260,6 @@ public final class AddPermisosUser extends javax.swing.JInternalFrame {
         this.cbPermiso.removeAllItems();
         String sql = "select * from tbl_seg_permissions";
         try {
-            cn = cc.datasource.getConnection();
             Statement st = cn.createStatement();
             ResultSet rs = st.executeQuery(sql);
             while (rs.next()) {

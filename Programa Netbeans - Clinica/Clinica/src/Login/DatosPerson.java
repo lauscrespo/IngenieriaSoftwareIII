@@ -1,7 +1,7 @@
 package Login;
 
+import Conexion.Conexion;
 import static Main.Main.desktopFondo;
-import conexion.pool;
 import java.awt.BorderLayout;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,11 +12,16 @@ public class DatosPerson extends javax.swing.JInternalFrame {
 
     FramePerson person;
     int tipoUsuario;
+    Conexion cc;
+    Connection cn;
 
     public DatosPerson(int tipo) {
 
         initComponents();
         this.setLocation(350, 50);
+        cc = new Conexion();
+        cn = cc.getConnection();
+
         PanelFondo2 F = new PanelFondo2();
         this.add(F, BorderLayout.CENTER);
         txtPersonId.setEditable(false);
@@ -211,17 +216,15 @@ public class DatosPerson extends javax.swing.JInternalFrame {
         txtNombre.setEditable(false);
         txtDireccion.setEditable(true);
         txtTelefono.setEditable(false);
-        pool cc = new pool();
-        Connection cn = null;
 
         //"INSERT INTO tbl_seg_user(Userid,PersonId,Rol,UserName,PasswordUser,Email,Estado) VALUES(?,?,?,?,?,?,?)";
         try {
-            cn = cc.datasource.getConnection();
             PreparedStatement psql = cn.prepareStatement("UPDATE tbl_person SET PersonId='" + txtPersonId.getText() + "',nombre='"
                     + txtNombre.getText() + "', apellido = '" + txtApellido.getText() + "',direccion='" + txtDireccion.getText() + "',telefono='" + txtTelefono.getText()
                     + "' where personid = '" + txtPersonId.getText() + "';");
 
             psql.executeUpdate();
+            psql.getMoreResults();
             JOptionPane.showMessageDialog(this, "PERSONA MODIFICADA");
             desktopFondo.removeAll();
             desktopFondo.repaint();
@@ -247,12 +250,10 @@ public class DatosPerson extends javax.swing.JInternalFrame {
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
         // TODO add your handling code here:
-        pool cc = new pool();
-        Connection cn = null;
         try {
-            cn = cc.datasource.getConnection();
             PreparedStatement psql = cn.prepareStatement("delete from  tbl_person where PersonId='" + txtPersonId.getText() + "';");
             psql.executeUpdate();
+            psql.getMoreResults();
             JOptionPane.showMessageDialog(this, "PERSONA ELIMINADO");
             desktopFondo.removeAll();
             desktopFondo.repaint();

@@ -1,7 +1,7 @@
 package Login;
 
+import Conexion.Conexion;
 import static Main.Main.desktopFondo;
-import conexion.pool;
 import java.awt.BorderLayout;
 import java.net.InetAddress;
 import java.sql.Connection;
@@ -17,14 +17,16 @@ import javax.swing.table.DefaultTableModel;
 public class FrameRol extends javax.swing.JInternalFrame {
 
     private Opciones2 opciones2;
+     Conexion cc;
+    Connection cn;
     Opciones opciones;
     DatosRol datRol;
-    pool cc = new pool();
-    Connection cn = null;
     int tipoUsuario = 2;
 
     public FrameRol(int tipoUsuario) {
         initComponents();
+        cc = new Conexion();
+        cn = cc.getConnection();
         this.setLocation(250, 50);
         PanelFondo2 F = new PanelFondo2();
         this.add(F, BorderLayout.CENTER);
@@ -45,7 +47,6 @@ public class FrameRol extends javax.swing.JInternalFrame {
         }
         String[] datos = new String[7];
         try {
-            cn = cc.datasource.getConnection();
 
             Statement st = cn.createStatement();
             ResultSet rs = st.executeQuery(sql);
@@ -227,9 +228,9 @@ public class FrameRol extends javax.swing.JInternalFrame {
         if (fila >= 0) {
             DatosRol rol = new DatosRol(tipoUsuario);
             try {
-                cn = cc.datasource.getConnection();
            PreparedStatement psql=cn.prepareStatement("delete from tbl_roles where rolid='"+tblRoles.getValueAt(fila, 0).toString()+"'");
            psql.executeUpdate();
+           psql.getMoreResults();
            mostrardatos("");
             } catch (SQLException e) {
                 System.out.println(e);

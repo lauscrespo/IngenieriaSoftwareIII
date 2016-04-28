@@ -1,9 +1,7 @@
 package Login;
 
 import static Main.Main.desktopFondo;
-import conexion.pool;
 import java.awt.BorderLayout;
-import java.sql.Connection;
 
 public class Opciones extends javax.swing.JInternalFrame {
 
@@ -12,8 +10,7 @@ public class Opciones extends javax.swing.JInternalFrame {
     FramePerson person;
     public FrameUsuarios cbPermisoUsuarios;
     private boolean AddPermisosUser;
-    Connection cn = null;
-    pool cc = new pool();
+    
 
     public Opciones() {
         initComponents();

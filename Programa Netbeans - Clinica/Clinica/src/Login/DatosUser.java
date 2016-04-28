@@ -1,7 +1,7 @@
 package Login;
 
+import Conexion.Conexion;
 import static Main.Main.desktopFondo;
-import conexion.pool;
 import java.awt.BorderLayout;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,11 +11,15 @@ import javax.swing.JOptionPane;
 public class DatosUser extends javax.swing.JInternalFrame {
 
     FrameUsuarios users;
+    Conexion cc;
+    Connection cn;
 
     public DatosUser() {
 
         initComponents();
         this.setLocation(350, 10);
+        cc = new Conexion();
+        cn = cc.getConnection();
         PanelFondo2 F = new PanelFondo2();
         this.add(F, BorderLayout.CENTER);
         txtUserID.setEditable(false);
@@ -251,22 +255,22 @@ public class DatosUser extends javax.swing.JInternalFrame {
         txtuser.setEditable(false);
         txtDescripcion.setEditable(false);
         txtEstado.setEditable(false);
-        pool cc = new pool();
-        Connection cn = null;
 
         //"INSERT INTO tbl_seg_user(Userid,PersonId,Rol,UserName,PasswordUser,Email,Estado) VALUES(?,?,?,?,?,?,?)";
         try {
-            cn = cc.datasource.getConnection();
             PreparedStatement psql = cn.prepareStatement("UPDATE tbl_seg_user SET userid='" + txtUserID.getText() + "',PersonId='" + txtPersonId1.getText() + "',UserName='"
                     + txtuser.getText() + "',Email='" + txtEmail.getText() + "',estado='" + txtEstado.getText() + "' where userid = '" + txtUserID.getText() + "';");
 
             psql.executeUpdate();
+            psql.getMoreResults();
             psql = cn.prepareStatement("UPDATE tbl_roles\n"
                     + "SET rol='" + txtrol.getText() + "'");
             psql.executeUpdate();
+            psql.getMoreResults();
             psql = cn.prepareStatement("UPDATE tbl_seg_permissions\n"
                     + "SET Description='" + txtDescripcion.getText() + "',Mnemonic='" + txtrol.getText() + "'");
             psql.executeUpdate();
+            psql.getMoreResults();
             System.out.print(txtUserID.getText());
             JOptionPane.showMessageDialog(this, "USUARIO MODIFICADO");
         } catch (SQLException e) {

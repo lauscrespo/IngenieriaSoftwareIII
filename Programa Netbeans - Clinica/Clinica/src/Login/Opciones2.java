@@ -1,15 +1,8 @@
 package Login;
 
 import static Main.Main.desktopFondo;
-import conexion.pool;
 import java.awt.BorderLayout;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.table.DefaultTableModel;
+
 
 public class Opciones2 extends javax.swing.JInternalFrame {
 
@@ -18,8 +11,6 @@ public class Opciones2 extends javax.swing.JInternalFrame {
     FramePerson person;
     public FrameUsuarios cbPermisoUsuarios;
     private boolean AddPermisosUser;
-    Connection cn = null;
-     pool cc = new pool();
     
     public Opciones2() {
         initComponents();

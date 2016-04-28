@@ -1,11 +1,11 @@
 package Login;
 
+import Conexion.Conexion;
 import static Main.Main.menuAdm;
 import static Main.Main.menuCitas;
 import static Main.Main.opcionesVentana;
 import static Main.Main.menuDoctores;
 import static Main.Main.menuPacientes;
-import conexion.pool;
 import java.awt.BorderLayout;
 import java.awt.HeadlessException;
 import java.net.InetAddress;
@@ -21,10 +21,14 @@ public class IniciarSesion extends javax.swing.JInternalFrame {
 
     private Opciones opciones;
     private Opciones2 opciones2;
+    Conexion cc;
+    Connection cn;
     private int cont;
 
     public IniciarSesion() {
         initComponents();
+        cc = new Conexion();
+        cn = cc.getConnection();
         this.setLocation(350, 50);
         PanelFondo F = new PanelFondo();
         this.add(F, BorderLayout.CENTER);
@@ -115,10 +119,6 @@ public class IniciarSesion extends javax.swing.JInternalFrame {
         String[] dato = new String[5];
 
         try {
-            pool cc = new pool();
-            Connection cn = null;
-            cn = cc.datasource.getConnection();
-
             Statement st = cn.createStatement();
             ResultSet rs = st.executeQuery(sqlusu);
             while (rs.next()) {
@@ -135,10 +135,10 @@ public class IniciarSesion extends javax.swing.JInternalFrame {
                             InetAddress address = InetAddress.getLocalHost();
                             ip = address.getHostAddress();
                             try {
-                                cn = cc.datasource.getConnection();
                                 PreparedStatement psql = cn.prepareStatement("INSERT INTO tbl_seg_loginhistory "
                                         + " (userid,fechaLog,ip ) values ('" + dato[0] + "', current_timestamp(),'" + ip + "');");
                                 psql.executeUpdate();
+                                psql.getMoreResults();
                             } catch (SQLException e) {
                                 System.out.println(e);
                             }
@@ -153,8 +153,8 @@ public class IniciarSesion extends javax.swing.JInternalFrame {
                         menuCitas.setEnabled(true);
                         menuPacientes.setEnabled(true);
                         menuDoctores.setEnabled(true);
-                        menuAdm.setEnabled(true);                       
-                        
+                        menuAdm.setEnabled(true);
+
                     } else {
                         opcionesVentana = "opcion2";
                         this.hide();

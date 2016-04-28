@@ -1,7 +1,7 @@
 package Login;
 
+import Conexion.Conexion;
 import static Main.Main.desktopFondo;
-import conexion.pool;
 import java.awt.BorderLayout;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,9 +12,13 @@ public class DatosRol extends javax.swing.JInternalFrame {
 
     FrameRol rol;
     int tipoUsuario;
+    Conexion cc;
+    Connection cn;
 
     public DatosRol(int tipo) {
         initComponents();
+        cc = new Conexion();
+        cn = cc.getConnection();
         this.setLocation(350, 50);
         PanelFondo2 F = new PanelFondo2();
         this.add(F, BorderLayout.CENTER);
@@ -156,12 +160,10 @@ public class DatosRol extends javax.swing.JInternalFrame {
 
         txtRolId.setEditable(false);
         txtRolNombre.setEditable(false);
-        pool cc = new pool();
-        Connection cn = null;
         try {
-            cn = cc.datasource.getConnection();
             PreparedStatement psql = cn.prepareStatement("update tbl_roles set rolid='" + txtRolId.getText() + "',rol='" + txtRolNombre.getText() + "'");
             psql.executeUpdate();
+            psql.getMoreResults();
             JOptionPane.showMessageDialog(this, "ROL MODIFICADO");
         } catch (SQLException e) {
             System.out.print(e);

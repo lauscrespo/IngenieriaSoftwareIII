@@ -1,7 +1,7 @@
 package Login;
 
+import Conexion.Conexion;
 import static Main.Main.desktopFondo;
-import conexion.pool;
 import java.awt.BorderLayout;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,8 +13,8 @@ import javax.swing.JOptionPane;
 public class AddPerson extends javax.swing.JInternalFrame {
 
     FrameUsuarios users;
-    pool cc = new pool();
-    Connection cn = null;
+    Conexion cc;
+    Connection cn;
     Opciones opciones;
     FramePerson person;
     int tipoUsuario;
@@ -22,7 +22,8 @@ public class AddPerson extends javax.swing.JInternalFrame {
     public AddPerson(int tipo) {
         initComponents();
         this.setLocation(350, 20);
-
+        cc = new Conexion();
+        cn = cc.getConnection();
         PanelFondo2 F = new PanelFondo2();
         this.add(F, BorderLayout.CENTER);
         tipoUsuario = tipo;
@@ -171,11 +172,7 @@ public class AddPerson extends javax.swing.JInternalFrame {
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
         // TODO add your handling code here:
-        pool cc = new pool();
-        Connection cn = null;
-
         try {
-            cn = cc.datasource.getConnection();
             PreparedStatement psql = cn.prepareStatement("INSERT INTO tbl_person(personid,nombre,apellido,direccion,telefono) VALUES('"
                     + txtPersonId.getText() + "','" + txtNombre.getText() + "','" + txtApellido.getText()
                     + "','" + txtDireccion.getText() + "','" + txtTelefono.getText() + "');"

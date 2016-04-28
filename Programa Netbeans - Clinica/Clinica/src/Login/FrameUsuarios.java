@@ -1,7 +1,7 @@
 package Login;
 
+import Conexion.Conexion;
 import static Main.Main.desktopFondo;
-import conexion.pool;
 import java.awt.BorderLayout;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,13 +17,15 @@ public final class FrameUsuarios extends javax.swing.JInternalFrame {
 
     DatosUser datUser;
     Opciones opciones;
-    pool cc = new pool();
-    Connection cn = null;
+    Conexion cc;
+    Connection cn;
     AddPermisosUser per;
     int a;
 
     public FrameUsuarios() {
         initComponents();
+        cc = new Conexion();
+        cn = cc.getConnection();
         this.setLocation(100, 0);
         PanelFondo2 F = new PanelFondo2();
         this.add(F, BorderLayout.CENTER);
@@ -34,7 +36,6 @@ public final class FrameUsuarios extends javax.swing.JInternalFrame {
 
     public void mostrardatos(String valor) {
         DefaultTableModel modelo = new DefaultTableModel();
-
         modelo.addColumn("User ID");
         modelo.addColumn("Person ID");
         modelo.addColumn("User Name");
@@ -46,21 +47,14 @@ public final class FrameUsuarios extends javax.swing.JInternalFrame {
         tblTablaDatos.setModel(modelo);
         String sql = "";
         if (valor.equals("")) {
-//              sql = "SELECT u.UserId,u.PersonId,u.UserName,u.Email,r.Rol,per.Description, u.estado \n"
-//                    + "                    FROM tbl_seg_user u,tbl_roles r, tbl_seg_permissionsuserroles p,tbl_seg_permissions per where u.RolId = r.RolId and u.UserId = p.OwnerId \n"
-//                    + "			and r.RolId = p.OwnerType  and p.PermissionId = per.PermissionId;";
-
             sql = "SELECT u.UserId,u.PersonId,u.UserName,u.Email,r.Rol,per.Description, u.estado \n"
                     + "                    FROM tbl_seg_user u,tbl_roles r, tbl_seg_permissionsuserroles p,tbl_seg_permissions per where u.RolId = r.RolId and u.UserId = p.OwnerId \n"
                     + "			and r.RolId = p.OwnerType and p.PermissionId = per.PermissionId;";
-            //           sql = "select * from tbl_seg_user;";
         } else {
 
         }
         String[] datos = new String[7];
         try {
-            cn = cc.datasource.getConnection();
-
             Statement st = cn.createStatement();
             ResultSet rs = st.executeQuery(sql);
             while (rs.next()) {
@@ -256,11 +250,10 @@ public final class FrameUsuarios extends javax.swing.JInternalFrame {
         int fila = tblTablaDatos.getSelectedRow();
         if (fila >= 0) {
             try {
-                cn = cc.datasource.getConnection();
                 PreparedStatement psql = cn.prepareStatement("delete from tbl_seg_user where userid = '" + tblTablaDatos.getValueAt(fila, 0).toString() + "'");
                 psql.executeUpdate();
+                psql.getMoreResults();
                 mostrardatos("");
-
             } catch (SQLException e) {
                 System.out.print(e);
             }
@@ -309,8 +302,6 @@ public final class FrameUsuarios extends javax.swing.JInternalFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        pool cc = new pool();
-        Connection cn = null;
         if (a == 0) {
             a = 1;
         } else {
@@ -320,10 +311,10 @@ public final class FrameUsuarios extends javax.swing.JInternalFrame {
         if (fila >= 0) {
 
             try {
-                cn = cc.datasource.getConnection();
                 PreparedStatement psql = cn.prepareStatement("UPDATE  tbl_seg_user set estado='" + a + "' where userid='" + tblTablaDatos.getValueAt(fila, 0).toString() + "'");
 
                 psql.executeUpdate();
+                psql.getMoreResults();
                 mostrardatos("");
             } catch (SQLException e) {
                 System.out.println(e);

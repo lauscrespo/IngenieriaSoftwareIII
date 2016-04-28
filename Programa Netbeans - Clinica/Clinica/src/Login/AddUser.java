@@ -1,7 +1,7 @@
 package Login;
 
+import Conexion.Conexion;
 import static Main.Main.desktopFondo;
-import conexion.pool;
 import java.awt.BorderLayout;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,15 +11,18 @@ import java.sql.Statement;
 import javax.swing.JOptionPane;
 
 public class AddUser extends javax.swing.JInternalFrame {
+
     static boolean getAddPermisosUser;
 
     FrameUsuarios users;
-    pool cc = new pool();
-    Connection cn = null;
+    Conexion cc;
+    Connection cn;
 
     public AddUser() {
         initComponents();
         this.setLocation(350, 5);
+        cc = new Conexion();
+        cn = cc.getConnection();
 
         PanelFondo2 F = new PanelFondo2();
         this.add(F, BorderLayout.CENTER);
@@ -216,16 +219,13 @@ public class AddUser extends javax.swing.JInternalFrame {
 
     private void botonguardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonguardarActionPerformed
         // TODO add your handling code here:
-        pool cc = new pool();
-        Connection cn = null;
-
         try {
-            cn = cc.datasource.getConnection();
             PreparedStatement psql = cn.prepareStatement("INSERT INTO tbl_seg_user(UserId,PersonId,RolId,UserName,PasswordUser,Email,Estado) VALUES('"
                     + txtUserID.getText() + "','" + txtPersonId.getText() + "','" + txtrol.getText()
                     + "','" + txtuser.getText() + "','" + txtPas.getText() + "','" + txtEmail.getText() + "','" + txtEstado.getText() + "');"
             );
             psql.executeUpdate();
+            psql.getMoreResults();
             JOptionPane.showMessageDialog(this, "USUARIO INSERTADO");
         } catch (SQLException e) {
             System.out.println(e);
@@ -245,7 +245,6 @@ public class AddUser extends javax.swing.JInternalFrame {
         this.cmbrol.removeAllItems();
         String sql = "select * from tbl_roles";
         try {
-            cn = cc.datasource.getConnection();
             Statement st = cn.createStatement();
             ResultSet rs = st.executeQuery(sql);
             while (rs.next()) {
@@ -254,12 +253,11 @@ public class AddUser extends javax.swing.JInternalFrame {
         } catch (Exception e) {
         }
     }
-    
+
     public void llenarcomboper() {
         this.cbPersonId.removeAllItems();
         String sql = "select * from tbl_person";
         try {
-            cn = cc.datasource.getConnection();
             Statement st = cn.createStatement();
             ResultSet rs = st.executeQuery(sql);
             while (rs.next()) {
@@ -268,10 +266,10 @@ public class AddUser extends javax.swing.JInternalFrame {
         } catch (Exception e) {
         }
     }
-    
-    
+
+
     private void cmbrolActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbrolActionPerformed
-        
+
         try {
             String sql = "select rolid from tbl_roles where rol='" + cmbrol.getSelectedItem().toString() + "'";
             Statement st = cn.createStatement();
@@ -298,7 +296,7 @@ public class AddUser extends javax.swing.JInternalFrame {
 
     private void cbPersonIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbPersonIdActionPerformed
         // TODO add your handling code here:
-         try {
+        try {
             String sql = "select personid from tbl_person where nombre='" + cbPersonId.getSelectedItem().toString() + "'";
             Statement st = cn.createStatement();
             ResultSet rs = st.executeQuery(sql);
@@ -307,7 +305,7 @@ public class AddUser extends javax.swing.JInternalFrame {
             }
         } catch (Exception e) {
         }
-        
+
     }//GEN-LAST:event_cbPersonIdActionPerformed
 
     private void txtPersonIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPersonIdActionPerformed

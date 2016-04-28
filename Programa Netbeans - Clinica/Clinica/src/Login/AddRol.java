@@ -1,7 +1,7 @@
 package Login;
 
+import Conexion.Conexion;
 import static Main.Main.desktopFondo;
-import conexion.pool;
 import java.awt.BorderLayout;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,9 +12,13 @@ public class AddRol extends javax.swing.JInternalFrame {
 
     FrameRol rol;
     int tipoUsuario;
+    Conexion cc;
+    Connection cn;
 
     public AddRol(int tipo) {
         initComponents();
+        cc = new Conexion();
+        cn = cc.getConnection();
         this.setLocation(350, 50);
         PanelFondo2 F = new PanelFondo2();
         this.add(F, BorderLayout.CENTER);
@@ -113,21 +117,16 @@ public class AddRol extends javax.swing.JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-
-        pool cc = new pool();
-        Connection cn = null;
-
         try {
-            cn = cc.datasource.getConnection();
             PreparedStatement psql = cn.prepareStatement("INSERT INTO tbl_roles(RolId,Rol) VALUES('"
                     + txtRolId.getText() + "','" + txtRolNombre.getText() + "');"
             );
             psql.executeUpdate();
+            psql.getMoreResults();
             JOptionPane.showMessageDialog(this, "ROL INSERTADO");
         } catch (SQLException e) {
             System.out.println(e);
         }
-
         desktopFondo.removeAll();
         desktopFondo.repaint();
         rol = new FrameRol(tipoUsuario);
